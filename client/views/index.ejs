@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+
+    <script>
+      const expires = 1 * 24 * 60 * 60 * 1000;
+
+      document.cookie = `ping=pong;${expires};path=/`;
+
+      console.log('cookies:', document.cookie)
+
+      fetch('http://lo:3011/check_cross_domain_request')
+              .then(response => response.json())
+              .then(data => console.log('returned cookies (GET lo:3011):', data));
+
+      fetch('http://lo:3011/check_cross_domain_request', {
+        method: 'POST',
+      })
+              .then(response => response.json())
+              .then(data => console.log('returned cookies: (POST lo:3011)', data));
+
+      fetch('http://lo:3011/check_cross_domain_request', {
+        credentials: 'include',
+      })
+              .then(response => response.json())
+              .then(data => console.log('returned cookies (GET with credentials lo:3011):', data));
+
+      fetch('http://manjaro:3012/check_cross_domain_request', {
+        credentials: 'include',
+      })
+              .then(response => response.json())
+              .then(data => console.log('returned cookies (GET with credentials manjaro:3012):', data));
+    </script>
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <p>Check console to check cookies requests behaviour</p>
+    <br/>
+    <form method='POST' action='http://lo:3011/check_cross_domain_request'>
+      <input type="submit" value="Manual POST lo:3011">
+    </form>
+    <br/>
+    <a href='http://lo:3011/image_with_cookie'>
+        <button>Open http://lo:3011/image_with_cookie</button>
+    </a>
+    <br/>
+    <br/>
+    <img src='http://lo:3011/image_with_cookie' height=64 alt='image_with_cookie'/>
+    <img src='http://lo:3011/image_with_signed_cookie' height=64 alt='image_with_signed_cookie'/>
+  </body>
+</html>
